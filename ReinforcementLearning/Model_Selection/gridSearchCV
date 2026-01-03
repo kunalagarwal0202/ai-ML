@@ -1,0 +1,38 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+dataset =pd.read_csv('Social_Network_Ads.csv')
+x=dataset.iloc[:,:-1].values
+y=dataset.iloc[:,-1].values
+
+from sklearn.model_selection import train_test_split
+
+x_test,x_train,y_test,y_train=train_test_split(x,y,test_size=0.2,random_state=42)
+
+from sklearn.preprocessing import StandardScaler
+sc=StandardScaler()
+x_train=sc.fit_transform(x_train)
+x_test=sc.transform(x_test)
+
+from sklearn.svm import SVC
+
+classifier=SVC(kernel='rbf',random_state=42)
+classifier.fit(x_train,y_train)
+
+
+from sklearn.model_selection import GridSearchCV
+
+parameters=[{'C':[0.25,0.5,0.75,1],
+             'kernel':['rbf','poly','sigmoid'],'gamma':[0.1,0.3,0.5,0.7,0.9]}]
+
+gd=GridSearchCV(estimator=classifier,
+                param_grid=parameters,
+                scoring='accuracy',
+                cv=10)
+gd.fit(x_train,y_train)
+bestAccuracy=gd.best_params_
+bestScore=gd.best_score_
+print(bestAccuracy)
+print(bestScore)
+
